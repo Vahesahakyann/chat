@@ -97,8 +97,10 @@ int main()
             {
                 if(delimeter==NULL)
                 {
-                  write(client[i].fd,"invalid name:try again\n",strlen("invalid name:try again\n"));
-                   break;
+                  if(client[j].fd>0)
+                  {
+                    write(client[j].fd,buffer,strlen(buffer));
+                  }
                 }
                 else
                 {
