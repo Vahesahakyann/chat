@@ -42,11 +42,25 @@ int main()
     scanf("%s",buffer);
     write(pollclient.fd,buffer,strlen(buffer));
     pollclient.events=POLLOUT|POLLIN|POLLHUP;
+    pid_t procread=fork();
    
     while(state)
     {    
         poll(&pollclient,1,2000);
-        if(pollclient.revents & POLLIN)
+        if(procread==0)
+        {
+            if(pollclient.revents & POLLIN)
+            {  printf("there is something to read!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+                int readfromothers=read(pollclient.fd,buffer,4095);
+                printf("%d------is read from other clients\n");
+                if(readfromothers>0)
+                {
+                    buffer[readfromothers]='\0';
+                }
+                fputs(buffer,stdout);
+            } 
+        }
+        /*if(pollclient.revents & POLLIN)
         {  printf("there is something to read!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
             int readfromothers=read(pollclient.fd,buffer,4095);
             printf("%d------is read from other clients\n");
@@ -56,7 +70,28 @@ int main()
             }
             fputs(buffer,stdout);
         }
-        if(pollclient.revents&POLLOUT)
+            */
+        if(procread>0)
+        {
+            if(pollclient.revents&POLLOUT)
+            {
+             fputs("write the username and message with this struture: username>[your message]\n",stdout);
+             fgets(buffer,4095,stdin);
+             if(strlen(buffer)>2)
+             {
+                int written=write(pollclient.fd,buffer,strlen(buffer));
+                printf("%d-bytes written\n",written);
+             }
+            }
+            if(pollclient.revents&POLLHUP)
+            {   
+                perror("server is unavaible to take action\n");
+               
+                free(buffer);
+                exit(1);
+            }
+        }
+        /*if(pollclient.revents&POLLOUT)
         {
          fputs("write the username and message with this struture: username>[your message]\n",stdout);
          fgets(buffer,4095,stdin);
@@ -73,6 +108,7 @@ int main()
             free(buffer);
             exit(1);
         }
+            */
 
     }
     
