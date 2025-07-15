@@ -60,7 +60,7 @@ int main()
         {
           if(client[i].fd==-1)
           {
-            client[i].fd=accept(sockfd,(struct sockaddr*)&serveraddress,&sizeofserveraddress);
+            client[i].fd=accept(sockfd,NULL,NULL);
             printf("there is client\n");
             int readnamebytes=read(client[i].fd,checknames[i],MAX_NAME_SIZE);
             checknames[i][readnamebytes]='\0';
